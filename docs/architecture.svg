@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1460" viewBox="0 0 1800 1460" role="img" aria-labelledby="title desc">
+  <title id="title">ShopLedger architecture and new order flow</title>
+  <desc id="desc">The browser UI reaches server.js and its four routers. A new order passes through stock, coupon, pricing, optional khata, order, and storage modules before data/db.json is written. Supporting modules for taxes, dates, invoices, reports, and configuration are also shown.</desc>
+  <defs>
+    <marker id="blueArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#2670c9"/></marker>
+    <marker id="grayArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#73849b"/></marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #17253a; }
+      .title { font-size: 34px; font-weight: 750; }
+      .subtitle { font-size: 17px; fill: #52637a; }
+      .section { font-size: 18px; font-weight: 750; letter-spacing: .08em; fill: #44617f; }
+      .name { font-size: 22px; font-weight: 700; }
+      .detail { font-size: 16px; fill: #52637a; }
+      .small { font-size: 14px; fill: #52637a; }
+      .step { font-size: 17px; font-weight: 700; fill: #2670c9; }
+      .blue { stroke: #2670c9; stroke-width: 3; fill: none; marker-end: url(#blueArrow); }
+      .gray { stroke: #73849b; stroke-width: 2.5; fill: none; marker-end: url(#grayArrow); }
+      .light { stroke: #bac7d7; stroke-width: 2; fill: none; }
+      .card { fill: #fff; stroke: #c9d6e5; stroke-width: 2; rx: 14; }
+      .focus { fill: #eef6ff; stroke: #62a2ed; stroke-width: 2.5; rx: 14; }
+      .panel { fill: #f5f8fc; stroke: #dce5ef; stroke-width: 2; rx: 20; }
+    </style>
+  </defs>
+
+  <rect width="1800" height="1460" fill="#ffffff"/>
+  <text x="70" y="62" class="title">ShopLedger architecture</text>
+  <text x="70" y="94" class="subtitle">Blue arrows trace POST /api/orders; gray arrows show other verified calls or file reads.</text>
+
+  <text x="70" y="150" class="section">ENTRY POINTS AND ROUTERS</text>
+  <rect x="70" y="180" width="350" height="112" class="focus"/>
+  <text x="94" y="220" class="name">Browser UI</text>
+  <text x="94" y="248" class="detail">public/index.html</text>
+  <text x="94" y="272" class="detail">public/js/app.js</text>
+
+  <rect x="530" y="180" width="340" height="112" class="focus"/>
+  <text x="554" y="220" class="name">server.js</text>
+  <text x="554" y="248" class="detail">Serves public/ and mounts /api</text>
+  <text x="554" y="272" class="detail">Also serves the HTML invoice</text>
+  <path d="M420 236 H530" class="blue"/>
+  <text x="451" y="223" class="small">HTTP</text>
+
+  <rect x="1010" y="168" width="340" height="64" class="card"/>
+  <text x="1030" y="195" class="name">routes/products.js</text>
+  <text x="1030" y="217" class="small">Products and coupons</text>
+  <rect x="1390" y="168" width="340" height="64" class="card"/>
+  <text x="1410" y="195" class="name">routes/customers.js</text>
+  <text x="1410" y="217" class="small">Khata accounts and settlements</text>
+  <rect x="1010" y="258" width="340" height="64" class="focus"/>
+  <text x="1030" y="285" class="name">routes/orders.js</text>
+  <text x="1030" y="307" class="small">POST /api/orders; list and cancel</text>
+  <rect x="1390" y="258" width="340" height="64" class="card"/>
+  <text x="1410" y="285" class="name">routes/reports.js</text>
+  <text x="1410" y="307" class="small">Preview, dashboard, GST audit</text>
+  <path d="M870 236 H920 V290 H1010" class="blue"/>
+  <path d="M920 236 V200 H1010" class="gray"/>
+  <path d="M700 180 V130 H1560 V168" class="gray"/>
+  <path d="M870 260 H970 V365 H1560 V322" class="gray"/>
+
+  <rect x="70" y="375" width="1030" height="1000" class="panel"/>
+  <text x="104" y="416" class="section">NEW ORDER: SERVER-SIDE PATH</text>
+  <text x="104" y="441" class="detail">The order router calls these modules in this order, then persists the updated in-memory data.</text>
+  <path d="M1180 322 V350 H585 V471" class="blue"/>
+
+  <rect x="170" y="471" width="830" height="88" class="focus"/>
+  <text x="198" y="499" class="step">1 · CHECK STOCK</text>
+  <text x="198" y="528" class="name">lib/inventory.js</text>
+  <text x="565" y="528" class="detail">Find products; check sellable quantities</text>
+
+  <rect x="170" y="583" width="830" height="88" class="focus"/>
+  <text x="198" y="611" class="step">2 · VALIDATE COUPON</text>
+  <text x="198" y="640" class="name">lib/coupons.js</text>
+  <text x="565" y="640" class="detail">Normalize code and validate subtotal</text>
+  <path d="M585 559 V583" class="blue"/>
+
+  <rect x="170" y="695" width="830" height="88" class="focus"/>
+  <text x="198" y="723" class="step">3 · CALCULATE TOTALS</text>
+  <text x="198" y="752" class="name">lib/pricing.js</text>
+  <text x="565" y="752" class="detail">Discount, GST, and payable total</text>
+  <path d="M585 671 V695" class="blue"/>
+
+  <rect x="170" y="807" width="830" height="88" class="focus"/>
+  <text x="198" y="835" class="step">4 · CHARGE CREDIT IF SELECTED</text>
+  <text x="198" y="864" class="name">lib/ledger.js</text>
+  <text x="565" y="864" class="detail">Khata orders: check limit, add balance</text>
+  <path d="M585 783 V807" class="blue"/>
+
+  <rect x="170" y="919" width="830" height="88" class="focus"/>
+  <text x="198" y="947" class="step">5 · COMMIT STOCK</text>
+  <text x="198" y="976" class="name">lib/inventory.js</text>
+  <text x="565" y="976" class="detail">Deduct ordered quantities from stock</text>
+  <path d="M585 895 V919" class="blue"/>
+
+  <rect x="170" y="1031" width="830" height="88" class="focus"/>
+  <text x="198" y="1059" class="step">6 · ADD ORDER</text>
+  <text x="198" y="1088" class="name">lib/orders.js</text>
+  <text x="565" y="1088" class="detail">Assign ID and date; append order</text>
+  <path d="M585 1007 V1031" class="blue"/>
+
+  <rect x="170" y="1143" width="830" height="88" class="focus"/>
+  <text x="198" y="1171" class="step">7 · SAVE CHANGES</text>
+  <text x="198" y="1200" class="name">lib/store.js</text>
+  <text x="565" y="1200" class="detail">Append audit entry; write JSON</text>
+  <path d="M585 1119 V1143" class="blue"/>
+
+  <rect x="170" y="1255" width="830" height="88" class="focus"/>
+  <text x="198" y="1283" class="step">8 · PERSISTED DATA</text>
+  <text x="198" y="1312" class="name">data/db.json</text>
+  <text x="565" y="1312" class="detail">Products, orders, customers, audit log</text>
+  <path d="M585 1231 V1255" class="blue"/>
+
+  <rect x="1140" y="375" width="590" height="1000" class="panel"/>
+  <text x="1174" y="416" class="section">SUPPORTING MODULES</text>
+  <text x="1174" y="441" class="detail">Additional code paths used by the server and routers</text>
+
+  <rect x="1200" y="475" width="470" height="82" class="card"/>
+  <text x="1224" y="507" class="name">config.js</text>
+  <text x="1224" y="535" class="detail">Port, shop, tax, coupon, stock settings</text>
+
+  <rect x="1200" y="587" width="470" height="82" class="card"/>
+  <text x="1224" y="619" class="name">lib/tax.js</text>
+  <text x="1224" y="647" class="detail">GST rate and CGST/SGST split</text>
+  <path d="M1435 557 V587" class="gray"/>
+  <path d="M1000 739 H1110 V628 H1200" class="gray"/>
+  <text x="1020" y="726" class="small">pricing calls tax</text>
+
+  <rect x="1200" y="699" width="470" height="82" class="card"/>
+  <text x="1224" y="731" class="name">lib/dates.js</text>
+  <text x="1224" y="759" class="detail">Dates for orders and khata entries</text>
+  <path d="M1000 1075 H1120 V740 H1200" class="gray"/>
+  <text x="1016" y="1061" class="small">orders calls dates</text>
+
+  <rect x="1200" y="811" width="470" height="82" class="card"/>
+  <text x="1224" y="843" class="name">lib/reports.js</text>
+  <text x="1224" y="871" class="detail">Dashboard and GST reconciliation</text>
+  <path d="M1730 290 H1760 V852 H1670" class="gray"/>
+
+  <rect x="1200" y="923" width="470" height="82" class="card"/>
+  <text x="1224" y="955" class="name">lib/invoice.js</text>
+  <text x="1224" y="983" class="detail">HTML invoice; invoice figures for audit</text>
+  <path d="M1435 893 V923" class="gray"/>
+
+  <text x="1200" y="1060" class="detail">Other verified links:</text>
+  <text x="1200" y="1092" class="small">products router → store, inventory, tax, coupons</text>
+  <text x="1200" y="1122" class="small">customers router → store, ledger</text>
+  <text x="1200" y="1152" class="small">reports router → store, reports, pricing, coupons</text>
+  <text x="1200" y="1182" class="small">reports module → inventory, ledger, invoice</text>
+  <text x="1200" y="1212" class="small">server.js → store, orders, invoice for invoice view</text>
+  <text x="1200" y="1242" class="small">config.js → server, inventory, tax, coupons, invoice</text>
+  <text x="1200" y="1272" class="small">pricing module → coupons, tax</text>
+
+  <text x="70" y="1424" class="small">Order route details: routes/orders.js reads data via lib/store.js before step 1; lib/store.js writes the updated data after step 7.</text>
+</svg>
